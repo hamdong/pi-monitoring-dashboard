@@ -28,7 +28,7 @@
       },
       "targets": [
         {
-          "expr": "node_temperature_celsius",
+          "expr": "node_thermal_zone_temp{type=\"cpu-thermal\"}",
           "legendFormat": "CPU Temp (°C)",
           "refId": "A"
         }
