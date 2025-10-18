@@ -1,0 +1,16 @@
+# Ignore environment files with secrets
+.env
+
+# Ignore Docker volumes and other system files (optional, if you add them)
+volumes/
+*.log
+
+# Ignore Grafana data (optional if you want to keep Grafana state out of git)
+grafana/data/
+
+# Ignore node_modules if you add any frontend or node code later
+node_modules/
+
+# OS generated files
+.DS_Store
+Thumbs.db
