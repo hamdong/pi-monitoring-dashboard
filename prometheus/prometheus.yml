@@ -1,5 +1,5 @@
 global:
-  scrape_interval: 30s # default is 15s, so this halves the scrape frequency
+  scrape_interval: 30s
   evaluation_interval: 30s
 
 scrape_configs:
@@ -9,8 +9,16 @@ scrape_configs:
 
   - job_name: 'node-exporter'
     static_configs:
-      - targets: ['localhost:9100']
+      - targets: ['node-exporter:9100']
 
   - job_name: 'cadvisor'
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'florabot'
+    static_configs:
+      - targets: ['discord-florabot:9200']
+
+  - job_name: 'lavalink'
+    static_configs:
+      - targets: ['lavalink:2333']

@@ -1,0 +1,194 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "uid": "lavalink-metrics",
+  "title": "Lavalink Metrics Dashboard",
+  "tags": ["lavalink", "metrics", "prometheus", "audio", "jvm", "system"],
+  "style": "dark",
+  "refresh": "15s",
+  "schemaVersion": 36,
+  "version": 2,
+  "description": "Monitor Lavalink node metrics: players, JVM, memory, CPU, and system load.",
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "15s", "30s", "1m", "5m"],
+    "time_options": ["1h", "6h", "12h", "24h", "2d", "7d"]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Players & Usage",
+      "id": 100,
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Total Players",
+      "id": 1,
+      "datasource": "prometheus",
+      "targets": [{ "expr": "lavalink_players_total", "refId": "A" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 50, "color": "orange" },
+              { "value": 100, "color": "red" }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 1 }
+    },
+    {
+      "type": "stat",
+      "title": "Players Playing",
+      "id": 2,
+      "datasource": "prometheus",
+      "targets": [{ "expr": "lavalink_playing_players_total", "refId": "A" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 10, "color": "orange" },
+              { "value": 30, "color": "red" }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 1 }
+    },
+    {
+      "type": "stat",
+      "title": "Uptime (s)",
+      "id": 3,
+      "datasource": "prometheus",
+      "targets": [
+        { "expr": "lavalink_uptime_milliseconds / 1000", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 1 }
+    },
+    {
+      "type": "row",
+      "title": "Memory & JVM",
+      "id": 200,
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Memory Used / Allocated / Reservable (bytes)",
+      "id": 4,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "lavalink_memory_used_bytes",
+          "legendFormat": "Used",
+          "refId": "A"
+        },
+        {
+          "expr": "lavalink_memory_allocated_bytes",
+          "legendFormat": "Allocated",
+          "refId": "B"
+        },
+        {
+          "expr": "lavalink_memory_reservable_bytes",
+          "legendFormat": "Reservable",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "decimals": 0
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 7 }
+    },
+    {
+      "type": "timeseries",
+      "title": "JVM Threads / Classes",
+      "id": 5,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "jvm_threads_current",
+          "legendFormat": "Threads",
+          "refId": "A"
+        },
+        {
+          "expr": "jvm_classes_currently_loaded",
+          "legendFormat": "Classes Loaded",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 7 }
+    },
+    {
+      "type": "row",
+      "title": "CPU & Load",
+      "id": 300,
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 }
+    },
+    {
+      "type": "timeseries",
+      "title": "System CPU Load (%)",
+      "id": 6,
+      "datasource": "prometheus",
+      "targets": [
+        { "expr": "lavalink_cpu_system_load_percentage * 100", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2
+        }
+      },
+      "gridPos": { "h": 5, "w": 12, "x": 0, "y": 15 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Lavalink CPU Load (%)",
+      "id": 7,
+      "datasource": "prometheus",
+      "targets": [
+        { "expr": "lavalink_cpu_lavalink_load_percentage * 100", "refId": "A" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2
+        }
+      },
+      "gridPos": { "h": 5, "w": 12, "x": 12, "y": 15 }
+    }
+  ]
+}

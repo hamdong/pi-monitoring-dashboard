@@ -1,0 +1,429 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "uid": "florabot-metrics",
+  "title": "Florabot Metrics Dashboard",
+  "tags": ["florabot", "discord", "metrics", "prometheus"],
+  "style": "dark",
+  "refresh": "30s",
+  "schemaVersion": 36,
+  "version": 4,
+  "description": "Tracks command usage, error rates, and performance metrics for Florabot.",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m", "15m"],
+    "time_options": ["1h", "6h", "12h", "24h", "2d", "7d"]
+  },
+  "templating": {
+    "list": [
+      {
+        "type": "query",
+        "name": "command",
+        "label": "Command",
+        "datasource": "prometheus",
+        "definition": "label_values(discord_bot_command_total, command_name)",
+        "refresh": 1,
+        "includeAll": true,
+        "multi": true,
+        "allValue": ".*"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Overview & Top Commands",
+      "id": 100,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "type": "stat",
+      "title": "Total Commands Run",
+      "id": 1,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "sum(increase(discord_bot_command_total[$__range]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top 5 Most Used Commands",
+      "id": 6,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "topk(5, sum(increase(discord_bot_command_total[$__range])) by (command_name))",
+          "legendFormat": "{{command_name}}",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "max": null,
+          "decimals": 0
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": ["last"],
+          "fields": "",
+          "values": false
+        },
+        "displayMode": "lcd"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 1
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top 5 Failing Commands",
+      "id": 7,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "topk(5, sum(increase(discord_bot_command_errors_total[$__range])) by (command_name))",
+          "legendFormat": "{{command_name}}",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "min": 0,
+          "max": null,
+          "decimals": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": ["last"],
+          "fields": "",
+          "values": false
+        },
+        "displayMode": "lcd"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top 5 Slowest Commands (P95)",
+      "id": 8,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "topk(5, histogram_quantile(0.95, sum(rate(discord_bot_command_duration_seconds_bucket[$__range])) by (le, command_name)))",
+          "legendFormat": "{{command_name}}",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "max": null,
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 2 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "reduceOptions": {
+          "calcs": ["last"],
+          "fields": "",
+          "values": false
+        },
+        "displayMode": "lcd"
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 1
+      }
+    },
+    {
+      "type": "row",
+      "title": "Performance Metrics",
+      "id": 200,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Command Usage (per command)",
+      "id": 2,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(discord_bot_command_total{command_name=~\"$command\"}[5m])) by (command_name)",
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Average Command Latency (s)",
+      "id": 4,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "rate(discord_bot_command_duration_seconds_sum{command_name=~\"$command\"}[5m]) / rate(discord_bot_command_duration_seconds_count{command_name=~\"$command\"}[5m])",
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 3,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": 1, "color": "yellow" },
+              { "value": 2, "color": "red" }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "P95 Command Latency (s)",
+      "id": 5,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(discord_bot_command_duration_seconds_bucket{command_name=~\"$command\"}[5m])) by (le, command_name))",
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 3,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "yellow"
+              },
+              {
+                "value": 2,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      }
+    },
+    {
+      "type": "row",
+      "title": "Errors",
+      "id": 300,
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Command Errors (per command)",
+      "id": 3,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(discord_bot_command_errors_total{command_name=~\"$command\"}[5m])) by (command_name)",
+          "legendFormat": "{{command_name}}",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ops",
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 1,
+                "color": "orange"
+              },
+              {
+                "value": 5,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 23
+      }
+    },
+    {
+      "type": "table",
+      "title": "Command Error Rate % (by command)",
+      "id": 9,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "100 * sum(rate(discord_bot_command_errors_total{command_name=~\"$command\"}[5m])) by (command_name) / sum(rate(discord_bot_command_total{command_name=~\"$command\"}[5m])) by (command_name)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "custom": {
+            "align": "right"
+          }
+        }
+      },
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 23
+      }
+    }
+  ]
+}
