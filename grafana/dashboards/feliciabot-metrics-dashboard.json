@@ -1,0 +1,129 @@
+{
+  "uid": "feliciabot-metrics",
+  "title": "Feliciabot Metrics Dashboard",
+  "description": "Tracks command usage, error rates, and bot status metrics for Feliciabot.",
+  "tags": ["feliciabot", "discord", "metrics", "prometheus"],
+  "style": "dark",
+  "editable": true,
+  "schemaVersion": 36,
+  "version": 7,
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "panels": [
+    {
+      "type": "bargauge",
+      "title": "Top 5 Prefix Commands (Total)",
+      "id": 2,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "topk(5, sum(feliciabot_commands_executed_total) by (command_name))",
+          "refId": "A",
+          "legendFormat": "{{command_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "none",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "green"
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": false
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top 5 Slash Commands (Total)",
+      "id": 10,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "topk(5, sum(feliciabot_slash_commands_executed_total) by (command_name))",
+          "refId": "A",
+          "legendFormat": "{{command_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "none",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": false
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 }
+    },
+    {
+      "type": "bargauge",
+      "title": "Top 5 Command Errors (Total)",
+      "id": 3,
+      "datasource": "prometheus",
+      "targets": [
+        {
+          "expr": "topk(5, sum(feliciabot_command_errors_total) by (command_name))",
+          "refId": "A",
+          "legendFormat": "{{command_name}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "unit": "none",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": false
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 }
+    },
+    {
+      "type": "stat",
+      "title": "Guild Count",
+      "id": 4,
+      "datasource": "prometheus",
+      "targets": [{ "expr": "feliciabot_guild_count", "refId": "A" }],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "color": { "mode": "fixed", "fixedColor": "green" }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 23 }
+    },
+    {
+      "type": "stat",
+      "title": "User Count",
+      "id": 5,
+      "datasource": "prometheus",
+      "targets": [{ "expr": "feliciabot_user_count", "refId": "A" }],
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "color": { "mode": "fixed", "fixedColor": "green" }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 23 }
+    }
+  ]
+}

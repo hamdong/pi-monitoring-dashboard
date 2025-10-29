@@ -11,6 +11,7 @@ services:
       - monitoring-network
       - florabot-metrics
       - lavalink-metrics
+      - feliciabot-metrics
     deploy:
       resources:
         limits:
@@ -72,4 +73,6 @@ networks:
   florabot-metrics:
     external: true
   lavalink-metrics:
+    external: true
+  feliciabot-metrics:
     external: true
